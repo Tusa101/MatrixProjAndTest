@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +33,7 @@ namespace MatrixProjAndTest
             {
                 for (int j = 0; j < Cols ; j++)
                 {
-                    _data[i*j] = initData[i,j];
+                    _data[i*Cols + j] = initData[i,j];
                 }
             }
             
@@ -45,7 +46,7 @@ namespace MatrixProjAndTest
                     throw new IndexOutOfRangeException("Index is less than a zero.");
                 if (i > Rows || j > Cols)
                     throw new IndexOutOfRangeException("Index is more than possible.");
-                return _data[i*j]; 
+                return _data[i * Cols + j]; 
             } 
             set 
             {
@@ -53,7 +54,7 @@ namespace MatrixProjAndTest
                     throw new IndexOutOfRangeException("Index is less than a zero.");
                 if (i > Rows || j > Cols)
                     throw new IndexOutOfRangeException("Index is more than possible.");
-                _data[i*j] = value; 
+                _data[i * Cols + j] = value; 
             }
         }
         public int Rows
@@ -107,7 +108,7 @@ namespace MatrixProjAndTest
                 {
                     for (int j = 0; j < Cols; j++)
                     {
-                        if (!((i != j && _data[i*j] == 0)||( i==j && _data[i*j] == 1)))
+                        if (!((i != j && _data[i * Cols + j] == 0)||( i==j && _data[i * Cols + j] == 1)))
                         {
                             return false;
                         }
@@ -165,11 +166,29 @@ namespace MatrixProjAndTest
             for (int i = 0; i < Rows; i++)
             {
                 for (int j = 0; j < Cols; j++)
-                {   
-                    temp += _data[i*j]
+                {
+                    if (i == j)
+                    {
+                        temp += _data[i * j];
+                    }
                 }
             }
+            return temp;
         }
-        
+        public override string ToString()
+        {
+            string temp = "";
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Cols; j++)
+                {
+                    temp = temp + _data[i * j].ToString() + " "; 
+                }
+                temp = temp.Trim() + "\n";
+            }   
+            return sb.ToString();
+        }
+
     }
 }
