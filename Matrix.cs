@@ -260,43 +260,30 @@ namespace MatrixProjAndTest
         /// <returns> возвращает true, если конвертация удалась, иначе - false</returns>
         public static bool TryParse(string s, out Matrix m)
         {
-
             if (s.Trim().Equals(String.Empty) || (s.Trim().Equals("\n")))
             {
                 m = new Matrix();
                 return false;
             }
             //соответствие формату 1 2 3 ..., 1 2 3 ..., 1 2 3 ...
-            Regex regex = new Regex(@"^(([0-9]+\s{1})*[,]{1}\s{1})*([0-9]+)*\s{1}$");
-            if (!Regex.IsMatch(s, regex.ToString(), RegexOptions.IgnoreCase))
-            {
-                m = new Matrix();
-                return false;
-            }
-            string[] lines;
-            int nColons = -1;
-            int prevComma = -1;
-            int nRows = 0;
+            List<string> lines;
+            int sizeCols = -1;
+            int sizeRows = 1;
             try
             {
-                int currLength;
-                lines = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i < lines.Length; i++)
+                lines = new List<string>(s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+                for (int i = 0; i < lines.Count; i++)
                 {
-                    if (nColons == -1 && lines[i] == ",")
+                    if (lines[i].EndsWith(','))
                     {
-                        nColons = i + 1;
-                        prevComma = i;
-                        nRows++;
+                        lines[i] = lines[i].Trim(',');
+                        sizeRows++;
+                        if (sizeCols==-1)
+                        {
+                            sizeCols = i+1;
+                        }
                     }
-                    currLength = i - prevComma;
-                    if (lines[i] == "," && nColons + 1 == currLength)
-                    {
-                        nRows++;
-                        continue;
-                    }
-                    m = new Matrix();
-                    return false;
+                    
                 }
             }
             catch (Exception)
@@ -304,21 +291,24 @@ namespace MatrixProjAndTest
                 m = new Matrix();
                 return false;
             }
-            m = new Matrix(nRows, nColons);
-            int iter = 0;
-            for (int i = 0; i < nRows; i++)
+            m = new Matrix(sizeRows, sizeCols);
+            try
             {
-                for (int j = 0; j < nColons; j++)
+                for (int i = 0; i < sizeRows; i++)
                 {
-                    if (lines[iter]!=",")
+                    for (int j = 0; j < sizeCols; j++)
                     {
-                        m[i, j] = double.Parse(lines[iter]);
+                        m[i, j] = double.Parse(lines[i * sizeCols + j]);
                     }
-                    iter++;
                 }
             }
-            return true;
+            catch (Exception)
+            {
+                m = new Matrix();
+                return false;
+            }
 
+            return true;
         }
     }
 }
